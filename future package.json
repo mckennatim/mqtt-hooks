@@ -1,0 +1,32 @@
+{
+  "name": "@mckennatim/mqtt-hooks",
+  "version": "1.0.0",
+  "description": "A custom package to add Context provider and hooks to react apps that connect to esp8266 and esp32 based sensor/relays/timers. Applications can use any subset of sensors, relays and timers from one or more devices. Talks to both mqtt broker and to server providing application configuration and authentication.  ",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mckennatim/mqtt-hooks.git"
+  },
+  "keywords": [
+    "mqtt",
+    "react",
+    "hooks",
+    "context",
+    "paho",
+    "esp8266",
+    "esp32"
+  ],
+  "author": "Timothy S. McKenna",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mckennatim/mqtt-hooks/issues"
+  },
+  "homepage": "https://github.com/mckennatim/mqtt-hooks#readme"
+},
+"dependencies": {
+  "react": "^16.8.6",
+  "paho.mqtt.js": "^2.0.5"
+}

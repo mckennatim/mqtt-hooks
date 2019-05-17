@@ -1,0 +1,7 @@
+node_modules/
+node_modules_not/
+bower_components
+jspm_package
+env.json
+*.mp4
+main.*
