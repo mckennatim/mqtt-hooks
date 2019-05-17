@@ -17,8 +17,8 @@ A custom package to add Context provider and hooks to react apps that connect to
       monitorFocus
     } from '@mckennatim/react-hooks'  
 
-###  ClientSoocket
-ClientSocket returns Context.Provider with client from a `new Paho.Client` and publish from a `new Pah.Message`
+###  ClientSocket
+ClientSocket returns Context.Provider with client from a `new Paho.Client` and publish from a `new Paho.Message`
 
       <Context.Provider value={[this.client, this.publish]}>
         {this.props.children}
@@ -30,14 +30,14 @@ ClientSocket is used to wrap any component that needs client and/or publish obje
         <Twitter />
       </ClientSocket>   
 
-where cfg is of the form
+where cfg is of the form and connects you to the mqtt broker
 
     {cfg.mqtt_server, cfg.mqtt_port, cfg.appid}
 
 example 
 
     "appid": "greenhouse",
-    "mqtt_server": "services.sitebuilt.net/iotb/wss", (the mqtt broker)
+    "mqtt_server": "services.sitebuilt.net/iotb/wss"
 		"mqtt_port": 4333,
 
 ### Context
@@ -117,13 +117,13 @@ zones
 Zones are set up by the original app author and it is a list of the things this app needs to function.  Devs are set up by the app installer or owner for a particular location and connects the id's of the things the app needs to the devices and sensors/relays/timers/schedules that the device has to offer.
 
 #### the parameters (ls, cfg and client)
-`ls` connects you to the localStorage key that corresponds to `cfg.appid`. It provides a `getItem()` function that allows access to the token inside the localstorage value string.  That token is sent inside a fetch to the server `cfg.url.api` . `client` is allong for the ride so it can be connected to.
+`ls` connects you to the localStorage key that corresponds to `cfg.appid`. It provides a `getItem()` function that allows access to the token inside the localstorage value string.  That token is sent inside a fetch to the server `cfg.url.api` . `client` is along for the ride so it can be connected to.
 
     headers: {'Authorization': 'Bearer '+ lsh['token']},
 
 #### what else useDevSpec does
 
-Still within the `useEffect` hook, `useDevSpec` uses the `useState` hook once `useDevSpec` fetches the data from the server. The  `useState` hooks sets the state of `devs`, `zones`  and `binfo`. The last thin to get done within the `useEffect` is to connect the client to the mqtt broker and return  way to shut it down if the component dismounts 
+Still within the `useEffect` hook, `useDevSpec` uses the `useState` hook once `useDevSpec` fetches the data from the server. The  `useState` hooks sets the state of `devs`, `zones`  and `binfo`. The last thing to get done within the `useEffect` is to connect the client to the mqtt broker and return  way to shut it down if the component dismounts 
 
     return ()=>{
       didCancel=true
@@ -138,7 +138,7 @@ In connecting to the mqtt broker, `useDevZones` sends the token from local stora
 
 ## setupSocket 
 
-Once you are connected, `setupSocket` runs. Carrying  `client` and `publish` and `devs` from `useDevSpecs` or `monitorFocus`, it also needs to know what `topics` you want to pay attention to. `['srstate', 'sched', 'flags', 'timr']` are most of them. Basicall these are the small and efficient type of messages that esp8266 and esp32 devices can handle decoding and encoding using c++. iot.sitebuilt.net has designed them. 
+Once you are connected, `setupSocket` runs. Carrying  `client`, `publish` and `devs` from `useDevSpecs` or `monitorFocus`, it also needs to know what `topics` you want to pay attention to. `['srstate', 'sched', 'flags', 'timr']` are most of them. Basically these are the small and efficient type of messages that esp8266 and esp32 devices can handle decoding and encoding using c++. iot.sitebuilt.net has designed them. 
 
 `srstate` is sent whenever the sensor or relay value changes or if setpoints like hilimit or lolimit are changed. 
 
@@ -152,7 +152,7 @@ Once you are connected, `setupSocket` runs. Carrying  `client` and `publish` and
 
     CYURD002/timr{"cREMENT":5,"IStIMERoN":4,"ISrELAYoN":5,"tIMElEFT":[0,0,26215,0,0]}
 
-On every connection `setupSocket` subscribes to these topics and requests the current state of things. These subsriptions (and publishing rigths too) are authorized at the mqtt broker using the token sent from `useDevZones` 
+On every connection `setupSocket` subscribes to these topics and requests the current state of things. These subscriptions (and publishing rigths too) are authorized at the mqtt broker using the token sent from `useDevZones` 
 
 ## processMessage
 
