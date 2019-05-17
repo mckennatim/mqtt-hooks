@@ -1,4 +1,6 @@
 node_modules/
+lib/
+dist/
 node_modules_not/
 bower_components
 jspm_package
