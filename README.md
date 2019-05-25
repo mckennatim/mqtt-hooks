@@ -1,7 +1,7 @@
 # @mckenna.tim/react-mqtt
+ 
 
-
-A custom package to add Context provider and hooks to react apps that connect to esp8266 and esp32 based sensor/relays/timers. Applications can use any subset of sensors, relays and timers from one or more devices. Talks to both mqtt broker and to server providing application configuration and authentication.
+A custom package used by https://sitebuilt.net/qr/ to add Context provider and hooks to react apps that connect to esp8266 and esp32 based sensor/relays/timers. Applications can use any subset of sensors, relays and timers from one or more devices. Talks to both mqtt broker and to server providing application configuration and authentication.
 
 ## Usage
 
@@ -152,7 +152,7 @@ Once you are connected, `setupSocket` runs. Carrying  `client`, `publish` and `d
 
     CYURD002/timr{"cREMENT":5,"IStIMERoN":4,"ISrELAYoN":5,"tIMElEFT":[0,0,26215,0,0]}
 
-On every connection `setupSocket` subscribes to these topics and requests the current state of things. These subscriptions (and publishing rigths too) are authorized at the mqtt broker using the token sent from `useDevZones` 
+On every connection `setupSocket` subscribes to these topics and requests the current state of things. These subscriptions (and publishing rights too) are authorized at the mqtt broker using the token sent from `useDevZones` 
 
 ## processMessage
 
@@ -163,3 +163,27 @@ On every connection `setupSocket` subscribes to these topics and requests the cu
 
 ## getZinfo
 `getZinfo` gets the Zone information that you may want to use for displaying the pretty name of the zone or any iimages or other data that may be associated with that zone.
+
+## utility functions
+### startWhen(tzd_tza, delay)
+
+When modify the days schedule of a device, you may be doing so from a different timezone. `startWhen(tzd_tza, delay)` takes browser time used by the app and transforms it to the current time as seen at the device. Timezones are sometimes expressed something like `Fri May 24 2019 16:53:07 GMT-0400 (Eastern Daylight Time)` where `GMT-0400` is a representation of timezone modified by Day Light Savings Time, `txd_tza` uses that representation expressed as  `device_location_tz - app(browser)_location_tz`. The second parameter is optional and would delay the start of the modified schedule. startWhen returns a time as an array `[hr, min]` like `[17, 45]`
+
+### endWhen(starttime, dur)
+
+`endWhen(starttime, dur)` takes a starttime in the form returned by `startWhen` and outputs an end time in the same format calculated using duration in the format `'1:15'`, returning a end time that is an hour and fifteen minutes later
+
+### newInterval(starttime, startval, endtime, endval)
+
+In modifying a schedule you will be inserting into that schedule a new interval. The format used by the iot devices varies. An example of the simplest form is `[[9,20,1], [13,15,0]]` which would turn a relay on at 9:20am and off at 1:15pm. An example of a change to a sensor controlled relay would be `[[17,15,72,70], [22,30,61,59]]` which might do something like change the setpiont of a thermostat from ~71 degrees at 5:15pm and then lower the thermostat to ~60 degrees at 10:30pm. Here the relay calling for heat is controlled by the thermostat.
+
+### add2sched(sched, newInterval, tzd_tza)
+
+`add2sched` modifies a schedule by inserting a new interval into it. The existing day's schedule is modified. Schedule events that have already happened are ignored. The new schedule that is returned starts from the moment you send it (although the new interval might not start rigth away, it might be delayed). Once the new interval completes then the remainder of the existing schedule will execute.
+
+### m2hm(min)
+
+`m2hm(min)` takes a number and returns a string like `'hr:min'`
+
+## refs
+https://medium.com/@TeeFouad/a-simple-guide-to-publishing-an-npm-package-506dd7f3c47a

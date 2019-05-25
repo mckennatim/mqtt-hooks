@@ -1,5 +1,5 @@
 import { useEffect, useState} from "react";
-import {connect } from './index'
+// import {connect } from './index'
 
 const geta=(dotstr, obj)=>{
   return dotstr.split(".")
@@ -12,8 +12,9 @@ export function useDevSpecs(ls,cfg, client,cb ){
   const [zones ,setZones] = useState({});
   const [binfo ,setBinfo] = useState({});
   const [devs,setDevs] = useState(undefined) 
+  const [error, setError] =useState(undefined)
+  const [mounted, setMounted] =useState(false)
   const fetchDevZones=()=>{
-    
     if(geta('lsh.token', lsh)){
       let url= cfg.url.api+'/admin/i/devzones'
       let options= {
@@ -30,25 +31,33 @@ export function useDevSpecs(ls,cfg, client,cb ){
     } 
   }
   useEffect(() => {
-    console.log('running useEFect in useDevSpecs')
     let didCancel=false
     if(!didCancel){
       fetchDevZones().then((data)=>{
-        setZones(data.zones)
-        console.log('specs: ', data)
-        console.log('str: ', JSON.stringify(data, null, 4 ))
-        //const devs = Object.keys(data.devs)
-        setDevs(data.devs)
-        setBinfo(data.binfo)
-        connect(client, lsh, ()=>cb(client,data.devs)) 
+        if (data.qmessage){
+          setError(data)
+        }else{
+          setZones(data.zones)
+          Object.keys(data.devs)
+          setDevs(data.devs)
+          setBinfo(data.binfo)
+          cb(data.devs)
+          // if (!client.isConnected()){
+          //   connect(client, lsh, ()=>cb(client,data.devs)) 
+          // }
+        }
       })
     }
     return ()=>{
       didCancel=true
-      client.disconnect()
+      setMounted(false)
+      if(client.isConnected()){
+        // console.log('client disconnecting')
+        client.disconnect()
+      }
     }
   }, []); 
-  return {devs, zones, binfo} 
+  return {devs, zones, binfo, error, mounted} 
 }
 
 

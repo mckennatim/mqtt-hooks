@@ -1,9 +1,10 @@
 
 
 const connect = (client,lsh, cb)=>{
+  // console.log('in connect')
   client.connect({
     onSuccess: (()=>{
-      cb()
+      cb(client)
     }),
     onFailure: function (message) {
       console.log("Connection failed: " + message.errorMessage);
@@ -17,15 +18,16 @@ const connect = (client,lsh, cb)=>{
 const monitorFocus=(window, client, lsh, cb)=>{
   window.onfocus = ()=>{
     if(!client.isConnected()){
-      console.log('focused')
-      connect(client, lsh, ()=>cb())
+      // console.log('focused')
+      connect(client, lsh, (client)=>cb('focused-connected',client))
     }
   }
   window.onblur= ()=>{
-    console.log('unfocused')
+    // console.log('unfocused')
     if(client.isConnected()){
       try{
         client.disconnect()
+        cb('blur-disconnected', client)
       }catch(err){
         console.log(err)
       }

@@ -20,13 +20,13 @@ const messageReducer = (state, action)=>{
 
 const findLabel=(message, devs)=>{
   const dev = Object.keys(devs).find(key => key === message.dev)
-  let i=undefined
+  let i=[]
   if(message.topic=='srstate'){
-    i = devs[dev].find((a)=>a.sr === message.payload.id)
+    i = devs[dev].filter((a)=>a.sr === message.payload.id)
   }if(message.topic=='timr'){
-    i = devs[dev].find((a)=>message.payload.tIMElEFT[a.sr]>0)
+    i = devs[dev].filter((a)=>message.payload.tIMElEFT[a.sr]>0)
   }if(message.topic=='sched'){
-    i = devs[dev].find((a)=>a.sr === message.payload.id)
+    i = devs[dev].filter((a)=>a.sr === message.payload.id)
   }
   return i
 }
@@ -36,42 +36,54 @@ const processRawMessage= (mess)=>{
   const dev = narr[0]
   const topic = narr[1]
   var pls = mess.payloadString
-  console.log(topic+ pls)
   const payload= JSON.parse(pls)
+  // console.log('topic + payload: ', topic + pls)
   const message = {dev:dev, topic:topic, payload:payload}
   return message
 }
 
 const processMessage = (mess, devs, zones, bigstate)=>{
   const message = processRawMessage(mess)
-  let devinf=undefined
-  const action={}
-  //action.payload={darr:undefined, pro:undefined, timeleft: undefined}
-  action.payload={}
-  devinf = findLabel(message, devs)
-  if(message.topic=='srstate'){
-    if(devinf && devinf.label){
-      action.type=devinf.label
-      action.payload.darr = message.payload.darr
+  const newstates =[]
+  const devinfArr = findLabel(message, devs)
+  devinfArr.map((devinf)=>{
+    const action={}
+    action.payload={}
+    if(message.topic=='srstate'){
+      if(devinf && devinf.label){
+        action.type=devinf.label
+        action.payload.darr = message.payload.darr
+      }
     }
-  }
-  if(message.topic=='timr'){
-    if(devinf && devinf.label){
-      action.type=devinf.label
-      action.payload.timeleft = message.payload.tIMElEFT[devinf.sr]  
+    if(message.topic=='timr'){
+      if(devinf && devinf.label){
+        action.type=devinf.label
+        action.payload.timeleft = message.payload.tIMElEFT[devinf.sr]  
+      }
     }
-  }
-  if(message.topic=='sched'){
-    if(devinf && devinf.label){
-      action.type=devinf.label
-      action.payload.pro = message.payload.pro
+    if(message.topic=='sched'){
+      if(devinf && devinf.label){
+        action.type=devinf.label
+        action.payload.pro = message.payload.pro
+      }
     }
+    if(message.topic=='devtime'){
+      action.type='time'
+      action.payload = message.payload
+    }
+    if(Object.entries(action.payload).length != 0){
+      const prt ={}
+      prt[action.type]= {...bigstate[action.type]}
+      const newstate =  messageReducer(prt, action)
+      newstates.push(newstate)
+    }    
+  })
+  if(message.topic=='devtime'){
+    newstates[0]={jdtime:message.payload}
   }
-  if(Object.entries(action.payload).length != 0){
-    const prt ={}
-    prt[action.type]= {...bigstate[action.type]}
-    const newstate =  messageReducer(prt, action)
-    return newstate
+  if(message.topic=='jdtime'){
+    newstates[0]={jdtime:message.payload}
   }
+  return newstates
 }
 export{processMessage}
