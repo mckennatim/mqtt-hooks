@@ -3,8 +3,7 @@ import { processMessage as processMessageLib } from "./processMessage";
 import { useDevSpecs as useDevSpecsLib} from './useDevSpecs'
 import {Context}from './context'
 import {connect, monitorFocus, subscribe, req, setupSocket } from './mq'
-import {startWhen, endWhen, newInterval, add2sched, m2hm, m2ms, getNow} from './utility'
-import {ZoneTimer} from './ZoneTimer.jsx'
+import {startWhen, endWhen, newInterval, add2sched, m2hm} from './utility'
 
 const getZinfo=(label,zones)=>zones.find((zone)=>zone.id==label)
 
@@ -26,4 +25,4 @@ const getDinfo=(label, devs)=>{
 export const ClientSocket = ProviderLib;
 export const processMessage = processMessageLib;
 export const useDevSpecs = useDevSpecsLib
-export {Context, connect, monitorFocus,getZinfo, getDinfo, subscribe, req, setupSocket, startWhen, endWhen, newInterval, add2sched, m2hm, m2ms, getNow, ZoneTimer}
+export {Context, connect, monitorFocus,getZinfo, getDinfo, subscribe, req, setupSocket, startWhen, endWhen, newInterval, add2sched, m2hm}

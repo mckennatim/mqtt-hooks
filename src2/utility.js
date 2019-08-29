@@ -82,7 +82,6 @@ const add2sched =  (osched, nintvl, tzd_tza)=>{
         acc.push(nintvl[0])
       } 
       else {i=2}
-      console.log('acc: ', JSON.stringify(acc))
       /*if we are at end of sched go add interval*/
       if (sched.length >1 && idx==sched.length-1){
         i=2
@@ -142,7 +141,14 @@ const add2sched =  (osched, nintvl, tzd_tza)=>{
   return newsched
 }
 
+const setRelayStatus= (bs)=>{
+  if(bs.timeleft>0){
+    bs.status='timed'
+  }else if (bs.darr[0]==1 && bs.timeleft==0){
+    bs.status='on'
+  } else bs.status='off'
+  return bs
+}
 
-
-export{startWhen, endWhen, newInterval, add2sched, m2hm, m2ms, getNow}
+export{startWhen, endWhen, newInterval, add2sched, m2hm, m2ms, getNow, setRelayStatus}
 
