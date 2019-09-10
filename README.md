@@ -17,17 +17,17 @@ A custom package used by https://sitebuilt.net/qr/ to add Context provider and h
       monitorFocus
     } from '@mckennatim/react-hooks'  
 
+Typically an app (like the prototype app `Cascada`) that uses `mqtt-hooks` 
+
+* imports `ClientSocket` in a top level component like `<App/>`  
+* imports `{  connect, Context, useDevSpecs,  processMessage, getZinfo,getDinfo ,setupSocket, monitorFocus}` into the control component (like `Control`) that subscribes to and publishes messages to `mqtt`
+* imports `{startWhen, endWhen, newInterval, add2sched, m2hm, m2ms}` utlity functions for components that need to put things in the right format to publish to `mqtt` (like `Pond` and `Spot`)
+
 ###  ClientSocket
-ClientSocket returns Context.Provider with client from a `new Paho.Client` and publish from a `new Paho.Message`
-
-      <Context.Provider value={[this.client, this.publish]}>
-        {this.props.children}
-      </Context.Provider>
-
-ClientSocket is used to wrap any component that needs client and/or publish objects. (The client is not connected at this point)
+ClientSocket is used to wrap any component+children that need client and/or publish objects. (The client is not connected at this point)
 
       <ClientSocket cfg={cfg}>
-        <Twitter />
+        <App />
       </ClientSocket>   
 
 where cfg is of the form and connects you to the mqtt broker
@@ -40,14 +40,24 @@ example
     "mqtt_server": "services.sitebuilt.net/iotb/wss"
 		"mqtt_port": 4333,
 
+ClientSocket returns Context.Provider with client from a `new Paho.Client` and publish from a `new Paho.Message`
+
+      <Context.Provider value={[this.client, this.publish]}>
+        {this.props.children}
+      </Context.Provider>    
+
 ### Context
-Context provides a way to access `client` and `publish`
+Context provides a way to access `client` and `publish` form the react builtin `useContext` hook
 
-        const [client, publish] = useContext(Context);
+    const [client, publish] = useContext(Context);
 
+All it is is what you get back from react's builtin  `createContext`
+
+    import { createContext } from "react";
+    export const Context = createContext();
 ### useDevSpec
 
-`useDevSpec` uses the `useEffect` hook to fetch [one time] information from the server about the devices and zones for the application at a particular address with a particular owner. This is set inside a token stored in local storage placed there by the authentication/authorization app https://iot.sitebuilt.net/v3/signin/
+`useDevSpec` uses the `useEffect` hook to fetch [one time] information from the server about the devices and zones and binfo for the application at a particular address with a particular owner. This is set inside a token stored in local storage placed there by the authentication/authorization app https://iot.sitebuilt.net/v3/signin/
 
     const {devs, zones, binfo}= useDevSpecs(ls, cfg, client, (client, devs)=>{
       setupSocket(client, devs, publish, topics, (devs, client)=>doOtherShit(devs, client))
@@ -123,7 +133,7 @@ Zones are set up by the original app author and it is a list of the things this 
 
 #### what else useDevSpec does
 
-Still within the `useEffect` hook, `useDevSpec` uses the `useState` hook once `useDevSpec` fetches the data from the server. The  `useState` hooks sets the state of `devs`, `zones`  and `binfo`. The last thing to get done within the `useEffect` is to connect the client to the mqtt broker and return  way to shut it down if the component dismounts 
+Still within the `useEffect` hook, `useDevSpec` uses the `useState` hook once `useDevSpec` fetches the data from the server. The  `useState` hooks sets the state of `devs`, `zones`  and `binfo`. The last thing to get done within the `useEffect` is to connect the client to the mqtt broker and return as a way to shut it down if the component dismounts 
 
     return ()=>{
       didCancel=true
