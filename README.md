@@ -20,7 +20,7 @@ A custom package used by https://sitebuilt.net/qr/ to add Context provider and h
 Typically an app (like the prototype app `Cascada`) that uses `mqtt-hooks` 
 
 * imports `ClientSocket` in a top level component like `<App/>`  
-* imports `{  connect, Context, useDevSpecs,  processMessage, getZinfo,getDinfo ,setupSocket, monitorFocus}` into the control component (like `Control`) that gets all the static app and device data from the database, parses it, processes messages for dispatch to components down line and sets up publish ability.
+* imports `{  connect, Context, useDevSpecs,  processMessage, getZinfo,getDinfo ,setupSocket, monitorFocus}` into the control component (like `Control`) that connects whenever it is loaded, gets all the static app and device data from the database, parses it, processes messages for dispatch to components down line and sets up publish ability.
 * imports `{startWhen, endWhen, newInterval, add2sched, m2hm, m2ms}` utlity functions for components that need to put things in the right format to publish to `mqtt` (like `Pond` and `Spot`)
 
 During testing be sure to change between local and npm imports everywhere at once. In `Cascada` that is in `App`, `Control`, `Pond` and `Spot`
