@@ -18,18 +18,23 @@ const messageReducer = (state, action)=>{
 }
 
 
-const findLabel=(message, devs)=>{
+const extractLabelArray=(message, devs)=>{
+  //app could have may devs each with its own srs
   const dev = Object.keys(devs).find(key => key === message.dev)
-  let i=[]
+  //messages all have dev/topic
+  let srlabelarr=[] //[{sr:2, labe:'bridge}, {sr:4, label:'pond}]
   if(message.topic=='srstate'){
-    i = devs[dev].filter((a)=>a.sr === message.payload.id)
+    srlabelarr = devs[dev].filter((a)=>a.sr === message.payload.id)
   }if(message.topic=='timr'){
-    i = devs[dev].filter((a)=>message.payload.tIMElEFT[a.sr]>0)//hack
-    // console.log('i: ', JSON.stringify(i))
+    if (message.payload.tIMElEFT.reduce((a,v)=>a+v)==0){
+      srlabelarr = devs[dev]//if /timr comes in as [0,0,0,0,0]then send it to all
+    }else {
+      srlabelarr = devs[dev].filter((a)=>message.payload.tIMElEFT[a.sr]>0)
+    }
   }if(message.topic=='sched'){
-    i = devs[dev].filter((a)=>a.sr === message.payload.id)
+    srlabelarr = devs[dev].filter((a)=>a.sr === message.payload.id)
   }
-  return i
+  return srlabelarr
 }
 
 const processRawMessage= (mess)=>{
@@ -38,7 +43,7 @@ const processRawMessage= (mess)=>{
   const topic = narr[1]
   var pls = mess.payloadString
   const payload= JSON.parse(pls)
-  // console.log('topic + payload: ', topic + pls)
+  // console.log('topic, payload: ', topic, pls)
   const message = {dev:dev, topic:topic, payload:payload}
   return message
 }
@@ -46,7 +51,7 @@ const processRawMessage= (mess)=>{
 const processMessage = (mess, devs, zones, bigstate)=>{
   const message = processRawMessage(mess)
   const newstates =[]
-  const devinfArr = findLabel(message, devs)
+  const devinfArr = extractLabelArray(message, devs)
   devinfArr.map((devinf)=>{
     const action={}
     action.payload={}

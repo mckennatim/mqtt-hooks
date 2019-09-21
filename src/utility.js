@@ -6,16 +6,13 @@ const getNow=(tzadj)=>{
   let hr = d.getHours()*1
   let min = d.getMinutes()*1
   const t = tzadj.split(':')
-  const tzh = t[0]*1
-  const tzm = tzh>0 ? t[1]*1 : t[1]*-1
-  if(tzm!=0) {
-    min=min+tzm
-    if(min>60){min+=-60; hr+=1}
-    if (min<0){min+=60; hr+=-1}
-  }
-  hr=hr+tzh
-  if(hr>=24){hr+=-24}
-  if (hr<0){hr+=24}
+  //-04:00 +240(browser UTC offset)
+  const tzadjmin=t[0]*60+t[1]*1+d.getTimezoneOffset()
+  let adjmin =hr*60+min+tzadjmin
+  adjmin = adjmin<0 ? adjmin+(24*60) : adjmin
+  adjmin = adjmin>(24*60) ? adjmin-(24*60) : adjmin
+  hr = Math.floor(adjmin/60)
+  min = adjmin % 60
   return [hr, min]
 }
 
@@ -148,6 +145,7 @@ const add2sched =  (osched, nintvl, tzadj)=>{
     //console.log('acc: ', JSON.stringify(acc))
     return acc
   }, [now])
+  newsched.unshift([0,0,0])
   return newsched
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "@mckennatim/mqtt-hooks",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A custom package to add Context provider and hooks to react apps that connect to esp8266 and esp32 based sensor/relays/timers. Applications can use any subset of sensors, relays and timers from one or more devices. Talks to both mqtt broker and to server providing application configuration and authentication. remember npm publish --access=public ",
   "main": "lib/index.js",
   "scripts": {
