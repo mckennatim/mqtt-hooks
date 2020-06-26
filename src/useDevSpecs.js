@@ -12,6 +12,7 @@ export function useDevSpecs(ls,cfg, client,cb ){
   const [zones ,setZones] = useState({});
   const [binfo ,setBinfo] = useState({});
   const [devs,setDevs] = useState(undefined) 
+  const [specs,setSpecs] = useState(undefined) 
   const [error, setError] =useState(undefined)
   const [mounted, setMounted] =useState(false)
   const fetchDevZones=()=>{
@@ -34,17 +35,20 @@ export function useDevSpecs(ls,cfg, client,cb ){
     let didCancel=false
     if(!didCancel){
       fetchDevZones().then((data)=>{
-        if (data.qmessage){
-          setError(data)
-        }else{
-          setZones(data.zones)
-          Object.keys(data.devs)
-          setDevs(data.devs)
-          setBinfo(data.binfo)
-          cb(data.devs)
-          // if (!client.isConnected()){
-          //   connect(client, lsh, ()=>cb(client,data.devs)) 
-          // }
+        if(data){
+          if (data && data.qmessage){
+            setError(data)
+          }else{
+            setZones(data.zones)
+            Object.keys(data.devs)
+            setDevs(data.devs)
+            setBinfo(data.binfo)
+            setSpecs(data.specs)
+            cb(data.devs, data.zones)
+            // if (!client.isConnected()){
+            //   connect(client, lsh, ()=>cb(client,data.devs)) 
+            // }
+          }
         }
       })
     }
@@ -56,8 +60,8 @@ export function useDevSpecs(ls,cfg, client,cb ){
         client.disconnect()
       }
     }
-  }, []); 
-  return {devs, zones, binfo, error, mounted} 
+  },[]); 
+  return {devs, zones, binfo, specs, error, mounted} 
 }
 
 

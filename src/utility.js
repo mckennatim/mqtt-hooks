@@ -64,6 +64,33 @@ const newInterval = (starttime, startval, endtime, endval)=>{
   return [st, en]
 }
 
+const hma2time=(hma)=>{
+  let ap = 'am'
+  let hr = hma[0]
+  let min = hma[1]
+  if(hr>12){
+    hr = hr-12
+    ap = 'pm'
+  }
+  if(hr==12)ap='pm'
+  if (hr==0 && min==0) hr=12
+  hr = hr.toString().padStart(2,'')
+  min = min.toString().padStart(2,'0')
+  return `${hr}:${min} ${ap}`
+}
+
+const whereInSched = (sched,tzadj)=>{
+  let now= getNow(tzadj)
+  const idx = sched.findIndex((s)=>{
+    return hm2m(s)>hm2m(now)
+  })
+  if(idx>-1){
+  //  console.log('hm2m(sched[idx]): ', hma2time(sched[idx]))
+  }
+  // console.log('idx: ', idx)
+  return idx
+}
+
 const add2sched =  (osched, nintvl, tzadj)=>{
   let i=0
   let now= getNow(tzadj)
@@ -158,5 +185,5 @@ function setRelayStatus (bs){
   return bs
 }
 
-export{startWhen, endWhen, newInterval, add2sched, m2hm, m2ms, getNow, setRelayStatus}
+export{startWhen, endWhen, newInterval, add2sched, m2hm, m2ms, getNow, setRelayStatus, whereInSched, hma2time}
 

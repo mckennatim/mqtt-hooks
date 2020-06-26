@@ -43,12 +43,12 @@ const processRawMessage= (mess)=>{
   const topic = narr[1]
   var pls = mess.payloadString
   const payload= JSON.parse(pls)
-  // console.log('topic, payload: ', topic, pls)
+  // console.log('payload: ',dev, topic, JSON.stringify(payload))
   const message = {dev:dev, topic:topic, payload:payload}
   return message
 }
 
-const processMessage = (mess, devs, zones, bigstate)=>{
+const processMessage = (mess, devs, bigstate)=>{
   const message = processRawMessage(mess)
   const newstates =[]
   const devinfArr = extractLabelArray(message, devs)
